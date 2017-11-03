@@ -84,6 +84,12 @@ public class AudioPlayerView extends TextView {
         void onAudioFinished();
 
         void onError(Exception e);
+
+        void onAudioPause();
+
+        void onAudioPlay();
+
+
     }
 
     private OnAudioPlayerViewListener listener;
@@ -102,10 +108,19 @@ public class AudioPlayerView extends TextView {
         if (listener != null)
             listener.onAudioFinished();
     }
+    private void sendCallbackAudioPlay() {
+        if (listener != null)
+            listener.onAudioPlay();
+
+    }
 
     private void sendCallbackAudioReady() {
         if (listener != null)
             listener.onAudioReady();
+    }
+    private void sendCallbackAudioPause(){
+        if(listener != null)
+            listener.onAudioPause();
     }
 
     private void sendCallbackAudioPreparing() {
@@ -238,6 +253,7 @@ public class AudioPlayerView extends TextView {
     }
 
     private void play() throws IOException {
+
         if (!audioReady) {
 
             mediaPlayer = new MediaPlayer();
@@ -273,8 +289,10 @@ public class AudioPlayerView extends TextView {
             mediaPlayer.setOnCompletionListener(onCompletionListener);
             mediaPlayer.setOnErrorListener(onErrorListener);
 
+
         } else
             playAudio();
+
     }
 
     private void prepareAsync() {
@@ -287,6 +305,7 @@ public class AudioPlayerView extends TextView {
         progressUpdateHandler.postDelayed(updateProgressBar, AUDIO_PROGRESS_UPDATE_TIME);
         mediaPlayer.start();
         setText(pauseText);
+        sendCallbackAudioPlay();
     }
 
     private MediaPlayer.OnErrorListener onErrorListener = new MediaPlayer.OnErrorListener() {
@@ -335,10 +354,11 @@ public class AudioPlayerView extends TextView {
                 seekBar.setProgress(0);
             }
 
-            playAudio();
+
             audioReady = true;
             clearAnimation();
             sendCallbackAudioReady();
+            playAudio();
         }
     };
 
@@ -373,6 +393,7 @@ public class AudioPlayerView extends TextView {
             mediaPlayer.pause();
 //            mediaPlayer.seekTo(0);
             setText(playText);
+            sendCallbackAudioPause();
         }
     }
 
